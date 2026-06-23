@@ -33,43 +33,126 @@ Principais partes do sistema:
 - Possui Swagger para testar os endpoints.
 - Pode ser executado com Docker.
 
-## Requisitos
+## Requisitos para rodar
 
-- Docker Desktop aberto e funcionando.
+- Docker Desktop instalado.
 - SQL Server Express instalado.
-- Instância `SQLEXPRESS03` ligada.
-- Porta `1433` liberada no SQL Server.
+- SQL Server Management Studio instalado.
 - PowerShell.
+- Porta `1433` disponível para o SQL Server.
 
-Entre na pasta do projeto:
+## Passo a passo para rodar o sistema
+
+### 1. Abrir a pasta do projeto
+
+Abra o PowerShell e entre na pasta:
 
 ```powershell
 cd "C:\Users\victo\Documents\UsuariosAPI\UsuariosAPI"
 ```
 
-## Conferir SQL Server
+### 2. Abrir o Docker Desktop
 
-Verifique se a porta 1433 está respondendo:
+Abra o **Docker Desktop** pelo menu iniciar do Windows.
+
+Espere ele terminar de carregar. Depois confira no PowerShell:
 
 ```powershell
-Test-NetConnection localhost -Port 1433
+docker version
 ```
 
-O resultado esperado é:
+Se esse comando falhar, o Docker ainda não está pronto.
+
+### 3. Ligar o SQL Server correto
+
+Este projeto usa a instância:
 
 ```text
-TcpTestSucceeded : True
+SQLEXPRESS03
 ```
 
-Se o `SQLEXPRESS03` estiver parado, inicie como administrador:
+No PowerShell como administrador, confira os serviços SQL:
+
+```powershell
+Get-Service | Where-Object { $_.Name -like "MSSQL*" -or $_.Name -like "SQLBrowser" } | Select-Object Name, Status, DisplayName
+```
+
+Se `MSSQL$SQLEXPRESS03` estiver parado, inicie:
 
 ```powershell
 Start-Service 'MSSQL$SQLEXPRESS03'
 ```
 
-Se aparecer erro `10048`, outra instância SQL está usando a mesma porta. Pare a instância conflitante e tente iniciar o `SQLEXPRESS03` novamente.
+Se aparecer erro `10048`, existe conflito de porta. Alguma outra instância SQL está usando a porta `1433`.
 
-## Criar banco e usuário
+Para descobrir:
+
+```powershell
+netstat -ano | findstr :1433
+```
+
+Depois pare a instância conflitante e tente iniciar o `SQLEXPRESS03` novamente.
+
+Exemplo:
+
+```powershell
+Stop-Service 'MSSQL$SQLEXPRESS01'
+Start-Service 'MSSQL$SQLEXPRESS03'
+```
+
+### 4. Habilitar TCP/IP no SQL Server
+
+Abra o **SQL Server Configuration Manager**.
+
+Vá em:
+
+```text
+SQL Server Network Configuration
+Protocols for SQLEXPRESS03
+```
+
+Faça:
+
+1. Habilite `TCP/IP`.
+2. Abra as propriedades de `TCP/IP`.
+3. Entre na aba `IP Addresses`.
+4. Em `IPAll`, limpe o campo `TCP Dynamic Ports`.
+5. Em `TCP Port`, coloque `1433`.
+6. Salve.
+7. Reinicie o serviço `SQL Server (SQLEXPRESS03)`.
+
+Depois teste:
+
+```powershell
+Test-NetConnection localhost -Port 1433
+```
+
+O esperado é:
+
+```text
+TcpTestSucceeded : True
+```
+
+### 5. Habilitar autenticação mista
+
+No **SQL Server Management Studio**, conecte em:
+
+```text
+localhost\SQLEXPRESS03
+```
+
+Use autenticação do Windows.
+
+Depois:
+
+1. Clique com o botão direito no servidor.
+2. Abra `Properties`.
+3. Entre em `Security`.
+4. Marque `SQL Server and Windows Authentication mode`.
+5. Salve.
+6. Reinicie o serviço `SQL Server (SQLEXPRESS03)`.
+
+### 6. Criar banco e usuário da API
 
 No SQL Server Management Studio, conecte em:
 
@@ -105,7 +188,7 @@ GO
 
 Use no `.env` a mesma senha definida no `CREATE LOGIN`.
 
-## Configurar `.env`
+### 7. Configurar o arquivo `.env`
 
 Crie o arquivo:
 
@@ -124,27 +207,53 @@ ALLOWED_HOSTS=localhost;127.0.0.1
 
 Não versionar o arquivo `.env`, pois ele contém senha do banco.
 
-## Rodar com Docker
+### 8. Subir o sistema com Docker
 
-Subir o sistema:
+Execute:
 
 ```powershell
 docker compose up -d --build
 ```
 
-Verificar status:
+Confira se o container está rodando:
 
 ```powershell
 docker compose ps
 ```
 
-Ver logs:
+O esperado é o container `usuarios_api` aparecer como `Up`.
+
+Se quiser ver os logs:
 
 ```powershell
 docker compose logs --tail 100 api
 ```
 
-Parar:
+### 9. Testar se funcionou
+
+Teste o health check:
+
+```powershell
+Invoke-WebRequest http://localhost:8080/health
+```
+
+Se retornar status `200`, a API está funcionando.
+
+Abra no navegador:
+
+```text
+http://localhost:8080
+```
+
+Também é possível abrir o Swagger:
+
+```text
+http://localhost:8080/swagger
+```
+
+### 10. Parar o sistema
+
+Quando quiser parar:
 
 ```powershell
 docker compose down
@@ -190,10 +299,10 @@ Cadastrar:
 
 ```powershell
 $novoUsuario = @{
-  nome = "Victor"
+  nome = "Rodrigo"
   sobrenome = "Souza"
-  email = "victor@exemplo.com"
-  genero = 1
+  email = "ex@exemplo.com"
+  genero = "Masculino-Feminino"
   dataNascimento = "1998-07-14"
 } | ConvertTo-Json
 
