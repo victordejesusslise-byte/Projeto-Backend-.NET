@@ -9,7 +9,7 @@
 - [x] Validações com FluentValidation.
 - [x] Erros padronizados com traceId.
 - [x] Swagger/OpenAPI.
-- [x] Site simples somente para cadastro.
+- [x] Site Razor Pages/C# com CRUD visual.
 - [x] 18 testes unitários.
 - [x] 11 testes de integração.
 - [x] Docker com health check e usuário não root.
@@ -36,4 +36,3 @@
 ## Critério de liberação
 
 O código está apto para avaliação e publicação no GitHub. A aplicação somente deve ser exposta à internet após a conclusão do pacote de segurança acima.
-

@@ -1,0 +1,250 @@
+@page "/site"
+@model UsuariosAPI.API.Pages.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Gerenciamento de usuários">
+  <title>UsuariosAPI - Gerenciamento de usuários</title>
+  <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+  <main class="pagina">
+    <section class="hero" aria-labelledby="titulo">
+      <div class="marca" aria-hidden="true">U</div>
+      <div>
+        <p class="legenda">UsuariosAPI</p>
+        <h1 id="titulo">Gerenciamento de usuários</h1>
+        <p class="descricao">
+          Tela em Razor Pages/C# para testar cadastro, listagem, busca por ID, atualização e exclusão.
+        </p>
+      </div>
+    </section>
+
+    <section class="grade-principal">
+      <article class="cartao" aria-labelledby="titulo-formulario">
+        <div class="topo-cartao">
+          <div>
+            <p class="legenda">POST e PUT</p>
+            <h2 id="titulo-formulario">@(Model.EmEdicao ? $"Editar usuário #{Model.Formulario.Id}" : "Cadastrar usuário")</h2>
+          </div>
+
+          @if (Model.EmEdicao)
+          {
+            <span class="etiqueta">Modo edição</span>
+          }
+        </div>
+
+        <form method="post" asp-page-handler="Salvar" id="form-usuario" novalidate>
+          <input asp-for="Formulario.Id" type="hidden">
+
+          <div class="grade-campos">
+            <label asp-for="Formulario.Nome">
+              Nome
+              <input asp-for="Formulario.Nome" maxlength="100" autocomplete="given-name" required>
+            </label>
+
+            <label asp-for="Formulario.Sobrenome">
+              Sobrenome
+              <input asp-for="Formulario.Sobrenome" maxlength="100" autocomplete="family-name" required>
+            </label>
+          </div>
+
+          <label asp-for="Formulario.Email">
+            E-mail
+            <input asp-for="Formulario.Email" type="email" maxlength="150" autocomplete="email" placeholder="voce@exemplo.com" required>
+          </label>
+
+          <div class="grade-campos">
+            <label asp-for="Formulario.Genero">
+              Gênero
+              <select asp-for="Formulario.Genero" required>
+                <option value="">Selecione</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Feminino">Feminino</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </label>
+
+            <label asp-for="Formulario.DataNascimento">
+              Data de nascimento <span class="opcional">(opcional)</span>
+              <input asp-for="Formulario.DataNascimento" type="date" autocomplete="bday">
+            </label>
+          </div>
+
+          @if (!string.IsNullOrWhiteSpace(Model.MensagemFormulario))
+          {
+            <div class="mensagem @Model.TipoMensagemFormulario" role="status">@Model.MensagemFormulario</div>
+          }
+
+          <div class="acoes">
+            <button type="submit">@(Model.EmEdicao ? "Salvar alterações" : "Cadastrar")</button>
+            <a class="botao-link" asp-page="/Index">Limpar</a>
+          </div>
+        </form>
+      </article>
+
+      <article class="cartao" aria-labelledby="titulo-busca">
+        <div class="topo-cartao">
+          <div>
+            <p class="legenda">GET por ID</p>
+            <h2 id="titulo-busca">Buscar usuário</h2>
+          </div>
+        </div>
+
+        <form method="post" asp-page-handler="Buscar" id="form-busca-id" class="linha-busca" novalidate>
+          <label asp-for="BuscaId">
+            ID do usuário
+            <input asp-for="BuscaId" type="number" min="1" step="1" placeholder="Ex: 1" required>
+          </label>
+          <button type="submit">Buscar</button>
+        </form>
+
+        <div class="resultado-busca">
+          @if (Model.UsuarioEncontrado is not null)
+          {
+            <dl class="detalhes-usuario">
+              <dt>ID</dt>
+              <dd>@Model.UsuarioEncontrado.Id</dd>
+              <dt>Nome</dt>
+              <dd>@Model.UsuarioEncontrado.Nome @Model.UsuarioEncontrado.Sobrenome</dd>
+              <dt>E-mail</dt>
+              <dd>@Model.UsuarioEncontrado.Email</dd>
+              <dt>Gênero</dt>
+              <dd>@Model.UsuarioEncontrado.Genero</dd>
+              <dt>Nascimento</dt>
+              <dd>@Model.FormatarData(Model.UsuarioEncontrado.DataNascimento)</dd>
+            </dl>
+
+            <a class="botao-link largura-total"
+               asp-page="/Index"
+               asp-page-handler="Editar"
+               asp-route-id="@Model.UsuarioEncontrado.Id">
+              Editar este usuário
+            </a>
+          }
+          else
+          {
+            <span>@(Model.MensagemBusca ?? "Informe um ID para consultar um usuário específico.")</span>
+          }
+        </div>
+      </article>
+    </section>
+
+    <section class="cartao" aria-labelledby="titulo-lista">
+      <div class="topo-lista">
+        <div>
+          <p class="legenda">GET, PUT e DELETE</p>
+          <h2 id="titulo-lista">Usuários cadastrados</h2>
+          <p class="descricao menor">@Model.ResumoLista</p>
+        </div>
+        <a class="botao-link" asp-page="/Index">Atualizar lista</a>
+      </div>
+
+      <form method="get" id="form-filtros" class="filtros" novalidate>
+        <label asp-for="FiltroNome">
+          Filtrar por nome
+          <input asp-for="FiltroNome" maxlength="100" placeholder="Nome ou sobrenome">
+        </label>
+
+        <label asp-for="FiltroEmail">
+          Filtrar por e-mail
+          <input asp-for="FiltroEmail" type="email" maxlength="150" placeholder="email@exemplo.com">
+        </label>
+
+        <label asp-for="Pagina">
+          Página
+          <input asp-for="Pagina" type="number" min="1" step="1">
+        </label>
+
+        <label asp-for="TamanhoPagina">
+          Tamanho
+          <input asp-for="TamanhoPagina" type="number" min="1" max="100" step="1">
+        </label>
+
+        <button type="submit">Aplicar filtros</button>
+      </form>
+
+      @if (!string.IsNullOrWhiteSpace(Model.MensagemLista))
+      {
+        <div class="mensagem @Model.TipoMensagemLista" role="status">@Model.MensagemLista</div>
+      }
+
+      <div class="tabela-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>Gênero</th>
+              <th>Nascimento</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="usuarios-tabela">
+            @if (Model.Usuarios?.Data.Any() == true)
+            {
+              @foreach (var usuario in Model.Usuarios.Data)
+              {
+                <tr>
+                  <td>@usuario.Id</td>
+                  <td>@usuario.Nome @usuario.Sobrenome</td>
+                  <td>@usuario.Email</td>
+                  <td>@usuario.Genero</td>
+                  <td>@Model.FormatarData(usuario.DataNascimento)</td>
+                  <td class="acoes-tabela">
+                    <a class="botao-mini"
+                       asp-page="/Index"
+                       asp-page-handler="Editar"
+                       asp-route-id="@usuario.Id"
+                       asp-route-FiltroNome="@Model.FiltroNome"
+                       asp-route-FiltroEmail="@Model.FiltroEmail"
+                       asp-route-Pagina="@Model.Pagina"
+                       asp-route-TamanhoPagina="@Model.TamanhoPagina">
+                      Editar
+                    </a>
+
+                    <form method="post" asp-page-handler="Remover" asp-route-id="@usuario.Id" class="form-inline">
+                      <button class="botao-mini perigo" type="submit">Apagar</button>
+                    </form>
+                  </td>
+                </tr>
+              }
+            }
+            else
+            {
+              <tr>
+                <td colspan="6">Nenhum usuário encontrado.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="paginacao">
+        <a class="botao-link @(Model.Pagina <= 1 ? "desabilitado" : "")"
+           asp-page="/Index"
+           asp-route-FiltroNome="@Model.FiltroNome"
+           asp-route-FiltroEmail="@Model.FiltroEmail"
+           asp-route-Pagina="@(Model.Pagina - 1)"
+           asp-route-TamanhoPagina="@Model.TamanhoPagina">
+          Página anterior
+        </a>
+
+        <a class="botao-link @(Model.Usuarios is null || Model.Pagina >= Model.Usuarios.TotalPaginas ? "desabilitado" : "")"
+           asp-page="/Index"
+           asp-route-FiltroNome="@Model.FiltroNome"
+           asp-route-FiltroEmail="@Model.FiltroEmail"
+           asp-route-Pagina="@(Model.Pagina + 1)"
+           asp-route-TamanhoPagina="@Model.TamanhoPagina">
+          Próxima página
+        </a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

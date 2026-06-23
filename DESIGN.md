@@ -25,7 +25,7 @@ UsuariosAPI.Infrastructure -> SQL Server SQLEXPRESS03
 | Domain | Entidade, enum e contrato do repositório |
 | Application | Casos de uso, DTOs, validações e erros de negócio |
 | Infrastructure | EF Core, DbContext, migrations e repositório |
-| API | HTTP, Swagger, middleware, DI e site de cadastro |
+| API | HTTP, Swagger, middleware, DI e tela Razor Pages em C# |
 
 ## Decisões
 
@@ -37,7 +37,7 @@ UsuariosAPI.Infrastructure -> SQL Server SQLEXPRESS03
 - FluentValidation para regras de entrada.
 - Middleware global para respostas de erro.
 - Swagger em `/swagger` apenas em Development.
-- Site estático em `wwwroot` somente para cadastro.
+- Interface web em Razor Pages/C# para testar cadastro, listagem, busca por ID, atualização e exclusão.
 - Docker conectado ao SQL Server instalado no Windows.
 - User Secrets para execução local e `.env` apenas para Compose.
 - Container não root, somente leitura e sem capabilities.
@@ -49,4 +49,3 @@ UsuariosAPI.Infrastructure -> SQL Server SQLEXPRESS03
 - Sem histórico persistente de operações.
 - Migrations automáticas na inicialização.
 - HTTPS depende do ambiente de hospedagem.
-

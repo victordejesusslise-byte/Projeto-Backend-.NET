@@ -2,19 +2,19 @@
 
 API REST em .NET 8 para cadastro e gerenciamento de usuários.
 
-O projeto também possui uma página web simples, usada somente para cadastrar novos usuários.
+O projeto também possui uma página web simples em **Razor Pages/C#** para testar cadastro, listagem, busca por ID, atualização e exclusão de usuários.
 
 ## Sobre o projeto
 
 O **UsuariosAPI** é um sistema backend criado para demonstrar uma API REST completa de cadastro de usuários.
 
-A aplicação permite registrar, consultar, listar, atualizar e remover usuários usando endpoints HTTP. Além da API, existe uma tela simples de cadastro para facilitar o teste visual do sistema.
+A aplicação permite registrar, consultar, listar, atualizar e remover usuários usando endpoints HTTP. Além da API, existe uma tela simples de gerenciamento para facilitar o teste visual do sistema.
 
 O objetivo do projeto é apresentar boas práticas de desenvolvimento backend, incluindo separação em camadas, validação de entrada, tratamento de erros, documentação Swagger, persistência em SQL Server, testes automatizados e execução com Docker.
 
 Principais partes do sistema:
 
-- **Site de cadastro**: página simples acessada pelo navegador.
+- **Site de gerenciamento**: página Razor Pages/C# acessada pelo navegador.
 - **API REST**: endpoints usados para manipular usuários.
 - **Banco de dados SQL Server**: armazena os usuários cadastrados.
 - **Swagger**: documentação interativa para testar a API.
@@ -22,7 +22,7 @@ Principais partes do sistema:
 
 ## O que o sistema faz
 
-- Cadastra usuários.
+- Cadastra usuários pelo site ou pela API.
 - Lista usuários com filtros e paginação.
 - Consulta usuário por ID.
 - Atualiza dados de usuário.
@@ -242,7 +242,7 @@ Se retornar status `200`, a API está funcionando.
 Abra no navegador:
 
 ```text
-http://localhost:8080
+http://localhost:8080/site
 ```
 
 Também é possível abrir o Swagger:
@@ -263,7 +263,7 @@ docker compose down
 
 | URL | Função |
 |---|---|
-| `http://localhost:8080` | Site simples de cadastro |
+| `http://localhost:8080/site` | Site simples para testar o CRUD |
 | `http://localhost:8080/swagger` | Swagger da API |
 | `http://localhost:8080/health` | Health check |
 | `http://localhost:8080/api/v1/usuarios` | Endpoint principal |

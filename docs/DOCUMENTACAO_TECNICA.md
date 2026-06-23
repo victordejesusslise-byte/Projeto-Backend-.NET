@@ -24,7 +24,7 @@ Ele descreve:
 
 ## 2. Resumo executivo
 
-UsuariosAPI é uma aplicação ASP.NET Core 8 composta por uma API REST de usuários e uma interface web mínima para cadastro. O frontend não implementa administração: listar, consultar, atualizar e excluir permanecem disponíveis somente pela API e pelo Swagger.
+UsuariosAPI é uma aplicação ASP.NET Core 8 composta por uma API REST de usuários e uma interface web em Razor Pages/C#. A tela permite cadastrar, listar, consultar por ID, atualizar e excluir usuários, usando a mesma camada de aplicação da API.
 
 O sistema utiliza SQL Server, Entity Framework Core, migrations, FluentValidation, Swagger/OpenAPI, xUnit, Moq e Docker. A solução está separada em Domain, Application, Infrastructure e API.
 
@@ -42,7 +42,7 @@ Na última verificação:
 
 ### 3.1 Incluído
 
-- Página web responsiva para cadastro.
+- Página web responsiva em Razor Pages/C# para CRUD visual.
 - Cadastro de usuário pela API.
 - Listagem paginada com filtros.
 - Consulta de usuário por ID.
@@ -78,21 +78,21 @@ Esses itens não impedem avaliação local. Autenticação, rate limiting, HTTPS
 
 | Endereço | Componente | Público alvo |
 |---|---|---|
-| `http://localhost:8080` | Formulário de cadastro | Usuário final |
+| `http://localhost:8080/site` | Tela Razor Pages de gerenciamento | Usuário final |
 | `http://localhost:8080/swagger` | Swagger | Desenvolvedor e avaliador |
 | `http://localhost:8080/health` | Health check | Operação e monitoramento |
 | `http://localhost:8080/api/v1/usuarios` | API REST | Sistemas clientes |
 
 Todos os endereços são rotas da mesma aplicação. Não existem três servidores diferentes.
 
-### 4.2 Fluxo de cadastro
+### 4.2 Fluxo pela tela Razor Pages
 
 ```text
 Navegador
    |
-   | POST /api/v1/usuarios
+   | POST formulário Razor
    v
-UsuariosController
+Index.cshtml.cs
    |
    v
 UsuarioService -> FluentValidation
@@ -106,6 +106,8 @@ Entity Framework Core
    v
 SQL Server - usuarios_db
 ```
+
+Os endpoints REST continuam disponíveis em `/api/v1/usuarios` e seguem o fluxo `UsuariosController -> UsuarioService -> Repository -> SQL Server`.
 
 ### 4.3 Dependências entre camadas
 
@@ -132,7 +134,7 @@ UsuariosAPI.Domain
 | Domain | Regras e abstrações centrais | `Usuario`, `Genero`, `IUsuarioRepository` |
 | Application | Casos de uso, validação e contratos HTTP internos | `UsuarioService`, DTOs, validators |
 | Infrastructure | Persistência e detalhes técnicos | `AppDbContext`, `UsuarioRepository`, migrations |
-| API | Entrada HTTP e inicialização | Controller, middleware, Swagger, site |
+| API | Entrada HTTP e inicialização | Controller, Razor Pages, middleware, Swagger |
 
 ### 5.1 Domain
 
@@ -163,9 +165,9 @@ DTOs separam o contrato externo da entidade de persistência:
 
 ### 5.4 API
 
-`UsuariosController` publica os cinco endpoints. `ExceptionHandlerMiddleware` converte exceções em respostas HTTP consistentes. `ServiceCollectionExtensions` centraliza a injeção de dependências.
+`UsuariosController` publica os cinco endpoints REST. `Pages/Index.cshtml` e `Pages/Index.cshtml.cs` implementam a tela web em Razor Pages/C#. `ExceptionHandlerMiddleware` converte exceções em respostas HTTP consistentes para a API. `ServiceCollectionExtensions` centraliza a injeção de dependências.
 
-O diretório `wwwroot` contém apenas o formulário, a folha de estilos e o JavaScript de cadastro.
+O diretório `wwwroot` contém apenas arquivos estáticos, como a folha de estilos. A lógica da tela fica em C# no PageModel.
 
 ## 6. Tecnologias e versões verificadas
 
@@ -478,7 +480,7 @@ Em Production, o Swagger não é exposto pelo pipeline atual.
 - EF Core e LINQ parametrizam consultas contra SQL Injection.
 - DTOs explícitos reduzem mass assignment.
 - FluentValidation limita formato e tamanho da entrada.
-- O frontend usa `textContent`, não injeta HTML retornado pela API.
+- A tela Razor usa encoding HTML padrão do ASP.NET Core e não injeta HTML retornado pelo usuário.
 - JSON utiliza o serializador padrão do ASP.NET Core.
 - Content Security Policy restringe scripts, estilos e conexões do site.
 - `X-Content-Type-Options: nosniff`.
@@ -590,7 +592,7 @@ Confirme a senha, habilite o login, crie o usuário dentro de `usuarios_db` e co
 
 ### Funcional
 
-- [ ] Abrir o site em `http://localhost:8080`.
+- [ ] Abrir o site em `http://localhost:8080/site`.
 - [ ] Cadastrar um usuário válido.
 - [ ] Confirmar mensagem de sucesso.
 - [ ] Tentar cadastrar o mesmo e-mail e confirmar 409.
@@ -651,4 +653,3 @@ Clean Architecture, Swagger, validações, testes e Docker.
 O sistema está pronto para demonstração, avaliação técnica e publicação do código-fonte no GitHub, desde que o arquivo `.env` e demais segredos não sejam enviados.
 
 Para publicar a aplicação na internet e receber tráfego real, a aprovação deve ficar condicionada a autenticação dos endpoints administrativos, rate limiting, HTTPS, privilégio mínimo do SQL Server e logs de auditoria.
-

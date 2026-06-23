@@ -40,17 +40,19 @@ public class UsuariosControllerTests : IClassFixture<WebApplicationFactory<Progr
     }
 
     [Fact]
-    public async Task SITE_Raiz_ExibeSomenteFormularioDeCadastroComCabecalhosDeSeguranca()
+    public async Task SITE_Raiz_ExibeTelaCrudComCabecalhosDeSeguranca()
     {
-        var response = await _client.GetAsync("/");
+        var response = await _client.GetAsync("/site");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal("DENY", response.Headers.GetValues("X-Frame-Options").Single());
         Assert.Contains("default-src 'self'", response.Headers.GetValues("Content-Security-Policy").Single());
 
         var html = await response.Content.ReadAsStringAsync();
-        Assert.Contains("id=\"form-cadastro\"", html);
-        Assert.Contains("Crie seu cadastro", html);
+        Assert.Contains("Gerenciamento de", html);
+        Assert.Contains("id=\"form-usuario\"", html);
+        Assert.Contains("id=\"form-busca-id\"", html);
+        Assert.Contains("id=\"usuarios-tabela\"", html);
     }
 
     [Fact]

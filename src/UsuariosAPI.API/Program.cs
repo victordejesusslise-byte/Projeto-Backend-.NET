@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddApiControllers();
+builder.Services.AddRazorPages();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerDocumentation();
 builder.Services.AddApplicationServices();
@@ -35,7 +36,6 @@ app.Use(async (context, next) =>
     await next();
 });
 
-app.UseDefaultFiles();
 app.UseStaticFiles();
 
 if (app.Environment.IsDevelopment())
@@ -50,6 +50,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+app.MapGet("/", () => Results.Redirect("/site"));
+app.MapRazorPages();
 app.MapControllers();
 app.MapHealthChecks("/health");
 
