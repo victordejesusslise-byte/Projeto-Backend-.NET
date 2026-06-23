@@ -24,6 +24,9 @@ coverage/
 *.coverage
 *.coveragexml
 
+## Arquivos temporários de geração de PDF
+tmp/pdfs/
+
 ## Docker
 .dockerignore
 

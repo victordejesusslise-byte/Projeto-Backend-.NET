@@ -399,6 +399,6 @@ Confira:
 ## Documentação completa
 
 - [Documentação técnica](docs/DOCUMENTACAO_TECNICA.md)
-- [PDF da documentação](output/pdf/Documentacao_UsuariosAPI.pdf)
+- [PDF da documentação](pdf/Documentacao_UsuariosAPI.pdf)
 - [Design do projeto](DESIGN.md)
 - [Plano do projeto](PLAN.md)
