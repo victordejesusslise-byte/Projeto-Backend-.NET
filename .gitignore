@@ -27,6 +27,9 @@ coverage/
 ## Docker
 .dockerignore
 
+## OpenSpec local
+openspec/
+
 ## NuGet
 *.nupkg
 *.snupkg
