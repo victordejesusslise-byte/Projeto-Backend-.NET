@@ -1,0 +1,38 @@
+## Ignorar arquivos gerados pelo .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+.idea/
+
+## Segredos e configurações locais — NUNCA versionar!
+.env
+appsettings.*.local.json
+
+## Migrations geradas localmente (opcional: remova se quiser versionar)
+# src/UsuariosAPI.Infrastructure/Data/Migrations/
+
+## Publicações e builds
+publish/
+out/
+artifacts/
+
+## Cobertura de testes
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+## Docker
+.dockerignore
+
+## NuGet
+*.nupkg
+*.snupkg
+.nuget/
+
+## OS
+.DS_Store
+Thumbs.db
+desktop.ini

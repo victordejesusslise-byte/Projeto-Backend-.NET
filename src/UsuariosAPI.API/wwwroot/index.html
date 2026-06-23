@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Cadastro de usuários">
+  <title>Cadastro de usuário</title>
+  <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+  <main class="pagina">
+    <section class="cartao" aria-labelledby="titulo">
+      <div class="cabecalho">
+        <span class="marca" aria-hidden="true">U</span>
+        <div>
+          <p class="legenda">UsuariosAPI</p>
+          <h1 id="titulo">Crie seu cadastro</h1>
+          <p class="descricao">Preencha seus dados. Leva menos de um minuto.</p>
+        </div>
+      </div>
+
+      <form id="form-cadastro" novalidate>
+        <div class="grade">
+          <label>
+            Nome
+            <input id="nome" name="nome" type="text" maxlength="100" autocomplete="given-name" required>
+          </label>
+
+          <label>
+            Sobrenome
+            <input id="sobrenome" name="sobrenome" type="text" maxlength="100" autocomplete="family-name" required>
+          </label>
+        </div>
+
+        <label>
+          E-mail
+          <input id="email" name="email" type="email" maxlength="150" autocomplete="email" placeholder="voce@exemplo.com" required>
+        </label>
+
+        <div class="grade">
+          <label>
+            Gênero
+            <select id="genero" name="genero" required>
+              <option value="">Selecione</option>
+              <option value="Masculino">Masculino</option>
+              <option value="Feminino">Feminino</option>
+              <option value="Outro">Outro</option>
+            </select>
+          </label>
+
+          <label>
+            Data de nascimento <span class="opcional">(opcional)</span>
+            <input id="dataNascimento" name="dataNascimento" type="date" autocomplete="bday">
+          </label>
+        </div>
+
+        <div id="mensagem" class="mensagem" role="status" aria-live="polite" hidden></div>
+
+        <button id="botao-cadastrar" type="submit">Cadastrar</button>
+      </form>
+
+      <p class="rodape">Seus dados são enviados diretamente para a API.</p>
+    </section>
+  </main>
+  <script src="/js/cadastro.js" defer></script>
+</body>
+</html>
