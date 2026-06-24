@@ -24,7 +24,7 @@ Ele descreve:
 
 ## 2. Resumo executivo
 
-UsuariosAPI é uma aplicação ASP.NET Core 8 composta por uma API REST de usuários e uma interface web em Razor Pages/C#. A tela permite cadastrar, listar, consultar por ID, atualizar e excluir usuários, usando a mesma camada de aplicação da API.
+UsuariosAPI é uma aplicação ASP.NET Core 8 composta por uma API REST de usuários e uma interface web em Razor Pages/C#. O site público permite cadastrar, buscar por ID e atualizar usuários. A área privada, protegida por senha configurada no `.env`, possui um painel completo para testar os cinco endpoints do CRUD: GET lista, GET por ID, POST, PUT e DELETE.
 
 O sistema utiliza SQL Server, Entity Framework Core, migrations, FluentValidation, Swagger/OpenAPI, xUnit, Moq e Docker. A solução está separada em Domain, Application, Infrastructure e API.
 
@@ -42,7 +42,8 @@ Na última verificação:
 
 ### 3.1 Incluído
 
-- Página web responsiva em Razor Pages/C# para CRUD visual.
+- Página web pública em Razor Pages/C# para cadastro, busca por ID e atualização.
+- Área privada em Razor Pages/C# com painel dos cinco endpoints do CRUD.
 - Cadastro de usuário pela API.
 - Listagem paginada com filtros.
 - Consulta de usuário por ID.
@@ -60,7 +61,7 @@ Na última verificação:
 
 ### 3.2 Não incluído no estado atual
 
-- Login e autenticação.
+- Autenticação completa por usuário, JWT ou provedor externo.
 - Autorização por perfil.
 - Rate limiting.
 - Recuperação de senha.
@@ -70,7 +71,7 @@ Na última verificação:
 - Pipeline automático do GitHub Actions.
 - Deploy em nuvem.
 
-Esses itens não impedem avaliação local. Autenticação, rate limiting, HTTPS e privilégio mínimo do banco são recomendados antes de exposição pública.
+Esses itens não impedem avaliação local. A área privada atual usa cookie de autenticação e senha administrativa do `.env`, suficiente para demonstração local. Para exposição pública, recomenda-se autenticação mais forte, rate limiting, HTTPS e privilégio mínimo do banco.
 
 ## 4. Visão da solução
 
@@ -78,7 +79,9 @@ Esses itens não impedem avaliação local. Autenticação, rate limiting, HTTPS
 
 | Endereço | Componente | Público alvo |
 |---|---|---|
-| `http://localhost:8080/site` | Tela Razor Pages de gerenciamento | Usuário final |
+| `http://localhost:8080/site` | Tela pública para cadastro, busca por ID e atualização | Usuário final |
+| `http://localhost:8080/site/admin/login` | Login da área privada | Avaliador e administrador local |
+| `http://localhost:8080/site/admin/tabela` | Painel privado dos endpoints e tabela | Avaliador e administrador local |
 | `http://localhost:8080/swagger` | Swagger | Desenvolvedor e avaliador |
 | `http://localhost:8080/health` | Health check | Operação e monitoramento |
 | `http://localhost:8080/api/v1/usuarios` | API REST | Sistemas clientes |
@@ -87,12 +90,17 @@ Todos os endereços são rotas da mesma aplicação. Não existem três servidor
 
 ### 4.2 Fluxo pela tela Razor Pages
 
+O site possui duas partes:
+
+- `/site`: tela simples para cadastro, busca por ID e atualização.
+- `/site/admin/tabela`: painel privado com listagem, filtros, cadastro, busca por ID, edição e exclusão.
+
 ```text
 Navegador
    |
    | POST formulário Razor
    v
-Index.cshtml.cs
+Index.cshtml.cs ou Admin/Tabela.cshtml.cs
    |
    v
 UsuarioService -> FluentValidation
@@ -165,7 +173,7 @@ DTOs separam o contrato externo da entidade de persistência:
 
 ### 5.4 API
 
-`UsuariosController` publica os cinco endpoints REST. `Pages/Index.cshtml` e `Pages/Index.cshtml.cs` implementam a tela web em Razor Pages/C#. `ExceptionHandlerMiddleware` converte exceções em respostas HTTP consistentes para a API. `ServiceCollectionExtensions` centraliza a injeção de dependências.
+`UsuariosController` publica os cinco endpoints REST. `Pages/Index.cshtml` e `Pages/Index.cshtml.cs` implementam a tela pública em Razor Pages/C#. `Pages/Admin/Login.cshtml` implementa o login da área privada e `Pages/Admin/Tabela.cshtml` implementa o painel privado com todos os endpoints do CRUD. `ExceptionHandlerMiddleware` converte exceções em respostas HTTP consistentes para a API. `ServiceCollectionExtensions` centraliza a injeção de dependências.
 
 O diretório `wwwroot` contém apenas arquivos estáticos, como a folha de estilos. A lógica da tela fica em C# no PageModel.
 
@@ -499,7 +507,7 @@ Em Production, o Swagger não é exposto pelo pipeline atual.
 
 | Risco | Situação atual | Recomendação |
 |---|---|---|
-| Acesso administrativo | GET, PUT e DELETE públicos | JWT ou chave de API com autorização |
+| Acesso administrativo | Área privada com senha do `.env`; API ainda sem JWT | JWT, chave de API ou provedor de identidade para internet |
 | Abuso de cadastro | Sem rate limiting | Limitar POST por IP e janela de tempo |
 | Transporte | HTTP local | HTTPS em IIS, Nginx, nuvem ou proxy reverso |
 | Privilégio SQL | `db_owner` no desenvolvimento | Conta de migration separada |
@@ -592,9 +600,12 @@ Confirme a senha, habilite o login, crie o usuário dentro de `usuarios_db` e co
 
 ### Funcional
 
-- [ ] Abrir o site em `http://localhost:8080/site`.
-- [ ] Cadastrar um usuário válido.
+- [ ] Abrir o site público em `http://localhost:8080/site`.
+- [ ] Cadastrar um usuário válido pelo site público.
 - [ ] Confirmar mensagem de sucesso.
+- [ ] Abrir a área privada em `http://localhost:8080/site/admin/login`.
+- [ ] Entrar com a senha `ADMIN_PANEL_PASSWORD` do `.env`.
+- [ ] Testar GET lista, GET por ID, POST, PUT e DELETE no painel privado.
 - [ ] Tentar cadastrar o mesmo e-mail e confirmar 409.
 - [ ] Testar GET, PUT e DELETE no Swagger.
 - [ ] Confirmar paginação e filtros.
