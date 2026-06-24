@@ -19,6 +19,7 @@ services:
       ASPNETCORE_URLS: http://+:8080
       AllowedHosts: ${ALLOWED_HOSTS:-localhost;127.0.0.1}
       ConnectionStrings__DefaultConnection: ${SQLSERVER_DOCKER_CONNECTION:?Defina SQLSERVER_DOCKER_CONNECTION no arquivo .env}
+      ADMIN_PANEL_PASSWORD: ${ADMIN_PANEL_PASSWORD:-}
     ports:
       - "8080:8080"
     extra_hosts:

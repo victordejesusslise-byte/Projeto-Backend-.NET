@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using UsuariosAPI.API.Extensions;
 using UsuariosAPI.API.Middlewares;
@@ -7,6 +8,18 @@ builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddApiControllers();
 builder.Services.AddRazorPages();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "UsuariosAPI.Admin";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.LoginPath = "/site/admin/login";
+        options.AccessDeniedPath = "/site/admin/login";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+        options.SlidingExpiration = true;
+    });
+builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerDocumentation();
 builder.Services.AddApplicationServices();
@@ -49,6 +62,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapGet("/", () => Results.Redirect("/site"));
 app.MapRazorPages();

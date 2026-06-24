@@ -25,42 +25,14 @@ public class IndexModel : PageModel
     [BindProperty]
     public long? BuscaId { get; set; }
 
-    [BindProperty(SupportsGet = true)]
-    public string? FiltroNome { get; set; }
-
-    [BindProperty(SupportsGet = true)]
-    public string? FiltroEmail { get; set; }
-
-    [BindProperty(SupportsGet = true)]
-    public int Pagina { get; set; } = 1;
-
-    [BindProperty(SupportsGet = true)]
-    public int TamanhoPagina { get; set; } = 10;
-
-    public PagedResponse<UsuarioResponse>? Usuarios { get; private set; }
     public UsuarioResponse? UsuarioEncontrado { get; private set; }
     public string? MensagemFormulario { get; private set; }
     public string TipoMensagemFormulario { get; private set; } = "sucesso";
-    public string? MensagemLista { get; private set; }
-    public string TipoMensagemLista { get; private set; } = "sucesso";
     public string? MensagemBusca { get; private set; }
     public bool EmEdicao => Formulario.Id.HasValue && Formulario.Id.Value > 0;
 
-    public string ResumoLista
+    public void OnGet()
     {
-        get
-        {
-            if (Usuarios is null)
-                return "Lista ainda não carregada.";
-
-            var totalPaginas = Math.Max(Usuarios.TotalPaginas, 1);
-            return $"{Usuarios.Total} usuário(s) encontrado(s). Página {Usuarios.Pagina} de {totalPaginas}.";
-        }
-    }
-
-    public async Task OnGetAsync(CancellationToken cancellationToken)
-    {
-        await CarregarListaAsync(cancellationToken);
     }
 
     public async Task OnGetEditarAsync(long id, CancellationToken cancellationToken)
@@ -74,11 +46,9 @@ public class IndexModel : PageModel
         }
         catch (BusinessException ex)
         {
-            MensagemLista = ObterMensagemErro(ex);
-            TipoMensagemLista = "erro";
+            MensagemFormulario = ObterMensagemErro(ex);
+            TipoMensagemFormulario = "erro";
         }
-
-        await CarregarListaAsync(cancellationToken);
     }
 
     public async Task<IActionResult> OnPostSalvarAsync(CancellationToken cancellationToken)
@@ -127,7 +97,6 @@ public class IndexModel : PageModel
             TipoMensagemFormulario = "erro";
         }
 
-        await CarregarListaAsync(cancellationToken);
         return Page();
     }
 
@@ -151,82 +120,12 @@ public class IndexModel : PageModel
             MensagemBusca = "Erro interno ao buscar usuário.";
         }
 
-        await CarregarListaAsync(cancellationToken);
-        return Page();
-    }
-
-    public async Task<IActionResult> OnPostRemoverAsync(long id, CancellationToken cancellationToken)
-    {
-        try
-        {
-            await _usuarioService.RemoverAsync(id, cancellationToken);
-            MensagemLista = $"Usuário #{id} removido com sucesso.";
-            TipoMensagemLista = "sucesso";
-
-            if (Formulario.Id == id)
-                Formulario = new UsuarioFormularioModel();
-        }
-        catch (BusinessException ex)
-        {
-            MensagemLista = ObterMensagemErro(ex);
-            TipoMensagemLista = "erro";
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Erro inesperado ao remover usuário pela tela Razor.");
-            MensagemLista = "Erro interno ao remover usuário.";
-            TipoMensagemLista = "erro";
-        }
-
-        await CarregarListaAsync(cancellationToken);
         return Page();
     }
 
     public string FormatarData(DateTime? data)
     {
         return data?.ToString("dd/MM/yyyy") ?? "-";
-    }
-
-    private async Task CarregarListaAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            NormalizarPaginacao();
-
-            Usuarios = await _usuarioService.ListarAsync(
-                new ListarUsuariosRequest
-                {
-                    Pagina = Pagina,
-                    TamanhoPagina = TamanhoPagina,
-                    Nome = FiltroNome,
-                    Email = FiltroEmail
-                },
-                cancellationToken);
-        }
-        catch (BusinessException ex)
-        {
-            Usuarios = new PagedResponse<UsuarioResponse>(
-                Enumerable.Empty<UsuarioResponse>(),
-                Math.Max(Pagina, 1),
-                Math.Clamp(TamanhoPagina, 1, 100),
-                0,
-                0);
-
-            MensagemLista = ObterMensagemErro(ex);
-            TipoMensagemLista = "erro";
-        }
-    }
-
-    private void NormalizarPaginacao()
-    {
-        if (Pagina < 1)
-            Pagina = 1;
-
-        if (TamanhoPagina < 1)
-            TamanhoPagina = 10;
-
-        if (TamanhoPagina > 100)
-            TamanhoPagina = 100;
     }
 
     private void PreencherFormulario(UsuarioResponse usuario)

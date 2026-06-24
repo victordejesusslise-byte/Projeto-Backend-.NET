@@ -19,8 +19,11 @@
         <p class="legenda">UsuariosAPI</p>
         <h1 id="titulo">Gerenciamento de usuários</h1>
         <p class="descricao">
-          Tela em Razor Pages/C# para testar cadastro, listagem, busca por ID, atualização e exclusão.
+          Tela em Razor Pages/C# para cadastrar, buscar por ID e atualizar usuários. A lista completa fica na área privada.
         </p>
+      </div>
+      <div class="hero-acoes">
+        <a class="botao-link" asp-page="/Admin/Login">Área privada</a>
       </div>
     </section>
 
@@ -134,117 +137,6 @@
       </article>
     </section>
 
-    <section class="cartao" aria-labelledby="titulo-lista">
-      <div class="topo-lista">
-        <div>
-          <p class="legenda">GET, PUT e DELETE</p>
-          <h2 id="titulo-lista">Usuários cadastrados</h2>
-          <p class="descricao menor">@Model.ResumoLista</p>
-        </div>
-        <a class="botao-link" asp-page="/Index">Atualizar lista</a>
-      </div>
-
-      <form method="get" id="form-filtros" class="filtros" novalidate>
-        <label asp-for="FiltroNome">
-          Filtrar por nome
-          <input asp-for="FiltroNome" maxlength="100" placeholder="Nome ou sobrenome">
-        </label>
-
-        <label asp-for="FiltroEmail">
-          Filtrar por e-mail
-          <input asp-for="FiltroEmail" type="email" maxlength="150" placeholder="email@exemplo.com">
-        </label>
-
-        <label asp-for="Pagina">
-          Página
-          <input asp-for="Pagina" type="number" min="1" step="1">
-        </label>
-
-        <label asp-for="TamanhoPagina">
-          Tamanho
-          <input asp-for="TamanhoPagina" type="number" min="1" max="100" step="1">
-        </label>
-
-        <button type="submit">Aplicar filtros</button>
-      </form>
-
-      @if (!string.IsNullOrWhiteSpace(Model.MensagemLista))
-      {
-        <div class="mensagem @Model.TipoMensagemLista" role="status">@Model.MensagemLista</div>
-      }
-
-      <div class="tabela-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nome</th>
-              <th>E-mail</th>
-              <th>Gênero</th>
-              <th>Nascimento</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="usuarios-tabela">
-            @if (Model.Usuarios?.Data.Any() == true)
-            {
-              @foreach (var usuario in Model.Usuarios.Data)
-              {
-                <tr>
-                  <td>@usuario.Id</td>
-                  <td>@usuario.Nome @usuario.Sobrenome</td>
-                  <td>@usuario.Email</td>
-                  <td>@usuario.Genero</td>
-                  <td>@Model.FormatarData(usuario.DataNascimento)</td>
-                  <td class="acoes-tabela">
-                    <a class="botao-mini"
-                       asp-page="/Index"
-                       asp-page-handler="Editar"
-                       asp-route-id="@usuario.Id"
-                       asp-route-FiltroNome="@Model.FiltroNome"
-                       asp-route-FiltroEmail="@Model.FiltroEmail"
-                       asp-route-Pagina="@Model.Pagina"
-                       asp-route-TamanhoPagina="@Model.TamanhoPagina">
-                      Editar
-                    </a>
-
-                    <form method="post" asp-page-handler="Remover" asp-route-id="@usuario.Id" class="form-inline">
-                      <button class="botao-mini perigo" type="submit">Apagar</button>
-                    </form>
-                  </td>
-                </tr>
-              }
-            }
-            else
-            {
-              <tr>
-                <td colspan="6">Nenhum usuário encontrado.</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-
-      <div class="paginacao">
-        <a class="botao-link @(Model.Pagina <= 1 ? "desabilitado" : "")"
-           asp-page="/Index"
-           asp-route-FiltroNome="@Model.FiltroNome"
-           asp-route-FiltroEmail="@Model.FiltroEmail"
-           asp-route-Pagina="@(Model.Pagina - 1)"
-           asp-route-TamanhoPagina="@Model.TamanhoPagina">
-          Página anterior
-        </a>
-
-        <a class="botao-link @(Model.Usuarios is null || Model.Pagina >= Model.Usuarios.TotalPaginas ? "desabilitado" : "")"
-           asp-page="/Index"
-           asp-route-FiltroNome="@Model.FiltroNome"
-           asp-route-FiltroEmail="@Model.FiltroEmail"
-           asp-route-Pagina="@(Model.Pagina + 1)"
-           asp-route-TamanhoPagina="@Model.TamanhoPagina">
-          Próxima página
-        </a>
-      </div>
-    </section>
   </main>
 </body>
 </html>

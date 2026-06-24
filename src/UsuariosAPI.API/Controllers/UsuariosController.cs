@@ -54,7 +54,7 @@ public class UsuariosController : ControllerBase
     }
 
     /// <summary>Retorna os detalhes de um usuário pelo ID.</summary>
-    /// <param name="id">Identificador do usuário.</param>
+    /// <param name="id">ID numérico do usuário. Exemplo: 1.</param>
     /// <param name="cancellationToken">Sinal de cancelamento da requisição.</param>
     /// <response code="200">Dados do usuário encontrado.</response>
     /// <response code="404">Usuário não encontrado.</response>
@@ -95,7 +95,7 @@ public class UsuariosController : ControllerBase
     }
 
     /// <summary>Atualiza os dados de um usuário existente.</summary>
-    /// <param name="id">Identificador do usuário.</param>
+    /// <param name="id">ID numérico do usuário. Exemplo: 1.</param>
     /// <param name="request">Novos dados completos do usuário.</param>
     /// <param name="cancellationToken">Sinal de cancelamento da requisição.</param>
     /// <response code="200">Usuário atualizado com sucesso.</response>
@@ -119,7 +119,7 @@ public class UsuariosController : ControllerBase
     }
 
     /// <summary>Remove um usuário pelo ID.</summary>
-    /// <param name="id">Identificador do usuário.</param>
+    /// <param name="id">ID numérico do usuário. Exemplo: 1.</param>
     /// <param name="cancellationToken">Sinal de cancelamento da requisição.</param>
     /// <response code="204">Usuário removido com sucesso.</response>
     /// <response code="404">Usuário não encontrado.</response>

@@ -52,7 +52,8 @@ public class UsuariosControllerTests : IClassFixture<WebApplicationFactory<Progr
         Assert.Contains("Gerenciamento de", html);
         Assert.Contains("id=\"form-usuario\"", html);
         Assert.Contains("id=\"form-busca-id\"", html);
-        Assert.Contains("id=\"usuarios-tabela\"", html);
+        Assert.Contains("Área privada", html);
+        Assert.DoesNotContain("id=\"usuarios-tabela\"", html);
     }
 
     [Fact]

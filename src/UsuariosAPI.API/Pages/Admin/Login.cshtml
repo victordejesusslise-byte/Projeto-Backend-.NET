@@ -1,0 +1,45 @@
+@page "/site/admin/login"
+@model UsuariosAPI.API.Pages.Admin.LoginModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Login da area privada">
+  <title>UsuariosAPI - Area privada</title>
+  <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+  <main class="pagina pagina-estreita">
+    <section class="hero" aria-labelledby="titulo-login">
+      <div class="marca" aria-hidden="true">A</div>
+      <div>
+        <p class="legenda">Area privada</p>
+        <h1 id="titulo-login">Verificacao da tabela</h1>
+        <p class="descricao">Entre com a senha administrativa configurada no arquivo <code>.env</code>.</p>
+      </div>
+    </section>
+
+    <section class="cartao">
+      <form method="post" novalidate>
+        <label asp-for="Senha">
+          Senha
+          <input asp-for="Senha" type="password" autocomplete="current-password" required>
+        </label>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Mensagem))
+        {
+          <div class="mensagem erro" role="alert">@Model.Mensagem</div>
+        }
+
+        <div class="acoes">
+          <button type="submit">Entrar</button>
+          <a class="botao-link" asp-page="/Index">Voltar ao site</a>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

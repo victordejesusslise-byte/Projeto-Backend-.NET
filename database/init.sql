@@ -20,8 +20,8 @@ BEGIN
     (
         id              BIGINT IDENTITY(1, 1) NOT NULL,
         nome            NVARCHAR(100) NOT NULL,
-        sobrenome       NVARCHAR(100) NOT NULL,
-        email           NVARCHAR(150) NOT NULL,
+        sobrenome       NVARCHAR(150) NOT NULL,
+        email           NVARCHAR(200) NOT NULL,
         genero          NVARCHAR(20) NOT NULL,
         data_nascimento DATE NULL,
         criado_em       DATETIME2 NOT NULL,

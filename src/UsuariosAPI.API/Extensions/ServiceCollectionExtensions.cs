@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using UsuariosAPI.API.Documentation;
 using UsuariosAPI.Application.DTOs.Requests;
 using UsuariosAPI.Application.DTOs.Responses;
 using UsuariosAPI.Application.Interfaces;
@@ -108,6 +109,8 @@ public static class ServiceCollectionExtensions
             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             if (File.Exists(xmlPath))
                 c.IncludeXmlComments(xmlPath);
+
+            c.OperationFilter<SwaggerParameterExamplesOperationFilter>();
         });
 
         return services;

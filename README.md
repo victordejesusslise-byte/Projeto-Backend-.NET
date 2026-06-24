@@ -2,13 +2,13 @@
 
 API REST em .NET 8 para cadastro e gerenciamento de usuários.
 
-O projeto também possui uma página web simples em **Razor Pages/C#** para testar cadastro, listagem, busca por ID, atualização e exclusão de usuários.
+O projeto também possui uma página web simples em **Razor Pages/C#** para testar cadastro, busca por ID e atualização de usuários. A área privada possui um painel com todos os endpoints do CRUD.
 
 ## Sobre o projeto
 
 O **UsuariosAPI** é um sistema backend criado para demonstrar uma API REST completa de cadastro de usuários.
 
-A aplicação permite registrar, consultar, listar, atualizar e remover usuários usando endpoints HTTP. Além da API, existe uma tela simples de gerenciamento para facilitar o teste visual do sistema.
+A aplicação permite registrar, consultar, listar, atualizar e remover usuários usando endpoints HTTP. Além da API, existe uma tela simples para cadastro e consulta, mais uma área privada para testar os endpoints e verificar a tabela de usuários.
 
 O objetivo do projeto é apresentar boas práticas de desenvolvimento backend, incluindo separação em camadas, validação de entrada, tratamento de erros, documentação Swagger, persistência em SQL Server, testes automatizados e execução com Docker.
 
@@ -23,10 +23,10 @@ Principais partes do sistema:
 ## O que o sistema faz
 
 - Cadastra usuários pelo site ou pela API.
-- Lista usuários com filtros e paginação.
+- Lista usuários com filtros e paginação pela API e pela área privada.
 - Consulta usuário por ID.
 - Atualiza dados de usuário.
-- Remove usuário.
+- Remove usuário pela API e pela área privada.
 - Valida os dados enviados.
 - Retorna erros padronizados.
 - Usa SQL Server com Entity Framework Core.
@@ -40,6 +40,26 @@ Principais partes do sistema:
 - SQL Server Management Studio instalado.
 - PowerShell.
 - Porta `1433` disponível para o SQL Server.
+
+## Precisa subir Node.js?
+
+Não. Este projeto não precisa de Node.js para rodar.
+
+A tela do site foi feita com **Razor Pages/C#**, então ela sobe junto com a aplicação .NET pelo Docker:
+
+```powershell
+docker compose up -d --build
+```
+
+Não existe comando `npm start`, `npm run dev` ou `node server.js` neste projeto.
+
+Se alguém perguntar "como subir o Node?", a resposta correta é:
+
+```text
+Não precisa subir Node. O frontend é Razor Pages/C# e roda dentro da própria API .NET.
+```
+
+O Node.js só seria necessário se o projeto tivesse um frontend separado em React, Angular, Vue ou JavaScript puro com servidor próprio. Este não é o caso.
 
 ## Passo a passo para rodar o sistema
 
@@ -203,9 +223,11 @@ Conteúdo esperado:
 SQLSERVER_DOCKER_CONNECTION=Server=host.docker.internal,1433;Database=usuarios_db;User Id=usuarios_api;Password=SUA_SENHA_REAL;Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True;
 ASPNETCORE_ENVIRONMENT=Development
 ALLOWED_HOSTS=localhost;127.0.0.1
+ADMIN_PANEL_PASSWORD=SUA_SENHA_DA_AREA_PRIVADA
 ```
 
 Não versionar o arquivo `.env`, pois ele contém senha do banco.
+Use uma senha diferente da senha do SQL Server.
 
 ### 8. Subir o sistema com Docker
 
@@ -263,7 +285,9 @@ docker compose down
 
 | URL | Função |
 |---|---|
-| `http://localhost:8080/site` | Site simples para testar o CRUD |
+| `http://localhost:8080/site` | Site simples para cadastro, busca por ID e atualização |
+| `http://localhost:8080/site/admin/login` | Login da área privada |
+| `http://localhost:8080/site/admin/tabela` | Painel privado dos endpoints e verificação da tabela |
 | `http://localhost:8080/swagger` | Swagger da API |
 | `http://localhost:8080/health` | Health check |
 | `http://localhost:8080/api/v1/usuarios` | Endpoint principal |
