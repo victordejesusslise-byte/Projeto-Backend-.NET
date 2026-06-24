@@ -42,3 +42,6 @@ openspec/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Pasta local de entrega
+Backend .NET/
