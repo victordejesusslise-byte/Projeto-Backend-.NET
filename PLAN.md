@@ -30,9 +30,9 @@
 - [ ] Testes de integração com SQL Server real ou Testcontainers.
 - [ ] RowVersion para concorrência.
 - [ ] Soft delete.
-- [ ] CI/CD com GitHub Actions.
+- [ ] CI/CD automatizado.
 - [ ] Health checks separados para liveness e readiness.
 
 ## Critério de liberação
 
-O código está apto para avaliação e publicação no GitHub. A aplicação somente deve ser exposta à internet após a conclusão do pacote de segurança acima.
+O código está apto para avaliação e entrega. A aplicação somente deve ser exposta à internet após a conclusão do pacote de segurança acima.

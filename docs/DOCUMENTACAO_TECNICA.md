@@ -8,7 +8,7 @@ Situação: funcional em ambiente local e Docker, com pendências explícitas pa
 
 ## 1. Objetivo deste documento
 
-Este documento reúne as informações necessárias para compreender, executar, testar, avaliar e aprovar o projeto antes da publicação no GitHub.
+Este documento reúne as informações necessárias para compreender, executar, testar, avaliar e aprovar o projeto.
 
 Ele descreve:
 
@@ -17,10 +17,11 @@ Ele descreve:
 - como preparar o SQL Server;
 - como executar com e sem Docker;
 - como usar todos os endpoints;
+- como o código e os processos principais funcionam;
 - como funcionam validações e erros;
 - quais controles de segurança já existem;
 - quais riscos ainda precisam de decisão;
-- como validar e publicar o repositório.
+- como validar o projeto antes da entrega.
 
 ## 2. Resumo executivo
 
@@ -68,7 +69,7 @@ Na última verificação:
 - Soft delete.
 - Histórico persistente de operações.
 - HTTPS terminado dentro do container.
-- Pipeline automático do GitHub Actions.
+- Pipeline automático de CI/CD.
 - Deploy em nuvem.
 
 Esses itens não impedem avaliação local. A área privada atual usa cookie de autenticação e senha administrativa do `.env`, suficiente para demonstração local. Para exposição pública, recomenda-se autenticação mais forte, rate limiting, HTTPS e privilégio mínimo do banco.
@@ -622,50 +623,250 @@ Confirme a senha, habilite o login, crie o usuário dentro de `usuarios_db` e co
 - [ ] Confirmar container `healthy`.
 - [ ] Confirmar que `.env` está ignorado.
 - [ ] Conferir migrations e tabela no SSMS.
-- [ ] Ler as pendências de segurança para publicação.
+- [ ] Ler as pendências de segurança antes de expor a aplicação publicamente.
 
 ### Documentação
 
 - [ ] Conferir README.
 - [ ] Conferir este documento.
 - [ ] Conferir o PDF renderizado.
-- [ ] Escolher licença do repositório.
+- [ ] Escolher licença do projeto, se necessário.
 
-## 21. Publicação no GitHub
+## 21. Fluxo do código e processos
 
-### 21.1 Conferência antes do commit
+Esta seção mostra, de forma visual e direta, como a aplicação funciona por dentro.
 
-```powershell
-dotnet test UsuariosAPI.sln --configuration Release
-dotnet list UsuariosAPI.sln package --vulnerable --include-transitive
-docker compose config --quiet
-git status --short
-git check-ignore .env
-```
-
-Não prossiga se `.env`, senha, token ou connection string real aparecerem entre os arquivos preparados.
-
-### 21.2 Primeiro envio
-
-```powershell
-git init
-git add .
-git status
-git commit -m "feat: adiciona API de usuarios documentada"
-git branch -M main
-git remote add origin https://github.com/SEU-USUARIO/UsuariosAPI.git
-git push -u origin main
-```
-
-### 21.3 Sugestão de descrição do repositório
+### 21.1 Fluxo geral das camadas
 
 ```text
-API REST em .NET 8 para gerenciamento de usuários, com SQL Server,
-Clean Architecture, Swagger, validações, testes e Docker.
+Cliente HTTP, Swagger ou tela Razor Pages
+        |
+        v
+UsuariosController ou PageModel Razor
+        |
+        v
+IUsuarioService / UsuarioService
+        |
+        +--> FluentValidation
+        |
+        v
+IUsuarioRepository / UsuarioRepository
+        |
+        v
+AppDbContext / Entity Framework Core
+        |
+        v
+SQL Server - usuarios_db
 ```
+
+Explicando em palavras simples:
+
+1. O usuário faz uma ação pelo navegador, Swagger ou PowerShell.
+2. A requisição chega no controller da API ou na tela Razor Pages.
+3. O service executa a regra de negócio.
+4. Os validators conferem se os dados estão corretos.
+5. O repository conversa com o banco.
+6. O Entity Framework Core transforma objetos C# em comandos SQL.
+7. O SQL Server grava ou consulta os dados.
+8. A resposta volta padronizada para quem chamou.
+
+### 21.2 Fluxo de listagem - GET /usuarios
+
+```text
+GET /usuarios?pagina=1&tamanhoPagina=10&nome=Victor
+        |
+        v
+UsuariosController.Listar
+        |
+        v
+UsuarioService.ListarAsync
+        |
+        v
+ListarUsuariosValidator
+        |
+        v
+UsuarioRepository.ListarAsync
+        |
+        v
+SQL Server com filtros e paginação
+        |
+        v
+ApiResponse<PagedResponse<UsuarioResponse>>
+        |
+        v
+HTTP 200 OK
+```
+
+Esse fluxo lista usuários usando paginação e filtros opcionais por nome e e-mail.
+
+### 21.3 Fluxo de cadastro - POST /usuarios
+
+```text
+POST /usuarios
+JSON com nome, sobrenome, email, genero e dataNascimento
+        |
+        v
+Model binding do ASP.NET Core
+        |
+        v
+UsuariosController.Criar
+        |
+        v
+UsuarioService.CriarAsync
+        |
+        +--> CriarUsuarioValidator
+        |
+        +--> Verifica se e-mail já existe
+        |
+        v
+Cria entidade Usuario
+        |
+        v
+UsuarioRepository.AdicionarAsync
+        |
+        v
+SQL Server grava o registro
+        |
+        v
+HTTP 201 Created
+```
+
+Esse fluxo garante que os dados estejam válidos, que o e-mail seja único e que a data de nascimento não esteja no futuro.
+
+### 21.4 Fluxo de atualização - PUT /usuarios/{id}
+
+```text
+PUT /usuarios/{id}
+JSON com os novos dados completos
+        |
+        v
+UsuariosController.Atualizar
+        |
+        v
+UsuarioService.AtualizarAsync
+        |
+        +--> Valida ID
+        +--> Busca usuário existente
+        +--> AtualizarUsuarioValidator
+        +--> Verifica e-mail único ignorando o próprio ID
+        |
+        v
+Usuario.Atualizar
+        |
+        v
+UsuarioRepository.AtualizarAsync
+        |
+        v
+SQL Server salva alteração
+        |
+        v
+HTTP 200 OK
+```
+
+O PUT atualiza o usuário inteiro. Por isso o corpo da requisição deve enviar todos os campos principais novamente.
+
+### 21.5 Fluxo de exclusão - DELETE /usuarios/{id}
+
+```text
+DELETE /usuarios/{id}
+        |
+        v
+UsuariosController.Remover
+        |
+        v
+UsuarioService.RemoverAsync
+        |
+        +--> Valida ID
+        +--> Busca usuário existente
+        |
+        v
+UsuarioRepository.RemoverAsync
+        |
+        v
+SQL Server remove o registro
+        |
+        v
+HTTP 204 No Content
+```
+
+Se o usuário não existir, a API retorna erro 404. Se o ID for inválido, retorna erro 422.
+
+### 21.6 Fluxo de tratamento de erros
+
+```text
+Erro de validação, negócio ou erro interno
+        |
+        v
+ExceptionHandlerMiddleware
+        |
+        +--> ValidationException -> HTTP 422
+        +--> NotFoundException   -> HTTP 404
+        +--> ConflictException   -> HTTP 409
+        +--> Erro inesperado     -> HTTP 500
+        |
+        v
+ApiResponse padronizado com mensagem, erros e traceId
+```
+
+Esse fluxo evita respostas soltas ou mensagens diferentes para cada erro. A API responde sempre em um formato previsível.
+
+### 21.7 Fluxo de execução com Docker
+
+```text
+Configurar SQL Server local
+        |
+        v
+Criar banco usuarios_db e login usuarios_api
+        |
+        v
+Criar arquivo .env a partir do .env.example
+        |
+        v
+docker compose up -d --build
+        |
+        v
+Container inicia a API
+        |
+        v
+EF Core aplica migrations
+        |
+        v
+Health check em /health
+        |
+        v
+Acessar /site, /site/admin/tabela, /swagger e /usuarios
+```
+
+O Docker sobe a aplicação .NET. O SQL Server continua rodando no Windows e é acessado pelo container usando `host.docker.internal`.
+
+### 21.8 Fluxo do site e área privada
+
+```text
+/site
+  |
+  +--> Cadastro de usuário
+  +--> Busca por ID
+  +--> Atualização após carregar um usuário
+
+/site/admin/login
+  |
+  +--> Valida ADMIN_PANEL_PASSWORD do .env
+  +--> Cria cookie de autenticação
+
+/site/admin/tabela
+  |
+  +--> Mostra mapa dos endpoints
+  +--> Lista usuários
+  +--> Busca por ID
+  +--> Cadastra
+  +--> Edita
+  +--> Remove
+```
+
+A tela pública foi mantida simples para cadastro e consulta. O painel privado concentra a verificação da tabela e o CRUD completo visual.
 
 ## 22. Parecer final
 
-O sistema está pronto para demonstração, avaliação técnica e publicação do código-fonte no GitHub, desde que o arquivo `.env` e demais segredos não sejam enviados.
+O sistema está pronto para demonstração, avaliação técnica e entrega do código-fonte, desde que o arquivo `.env` e demais segredos não sejam enviados.
 
-Para publicar a aplicação na internet e receber tráfego real, a aprovação deve ficar condicionada a autenticação dos endpoints administrativos, rate limiting, HTTPS, privilégio mínimo do SQL Server e logs de auditoria.
+Para expor a aplicação na internet e receber tráfego real, a aprovação deve ficar condicionada a autenticação dos endpoints administrativos, rate limiting, HTTPS, privilégio mínimo do SQL Server e logs de auditoria.
