@@ -9,7 +9,8 @@ namespace UsuariosAPI.API.Controllers;
 /// Gerenciamento de usuários — operações de CRUD com paginação e filtros.
 /// </summary>
 [ApiController]
-[Route("api/v1/[controller]")]
+[Route("usuarios")]
+[Route("api/v1/usuarios")]
 [Produces("application/json")]
 [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
 public class UsuariosController : ControllerBase

@@ -290,17 +290,18 @@ docker compose down
 | `http://localhost:8080/site/admin/tabela` | Painel privado dos endpoints e verificação da tabela |
 | `http://localhost:8080/swagger` | Swagger da API |
 | `http://localhost:8080/health` | Health check |
-| `http://localhost:8080/api/v1/usuarios` | Endpoint principal |
+| `http://localhost:8080/usuarios` | Endpoint principal |
+| `http://localhost:8080/api/v1/usuarios` | Alias versionado do endpoint |
 
 ## Endpoints
 
 | Método | Rota | Descrição |
 |---|---|---|
-| GET | `/api/v1/usuarios` | Lista usuários |
-| GET | `/api/v1/usuarios/{id}` | Busca usuário por ID |
-| POST | `/api/v1/usuarios` | Cadastra usuário |
-| PUT | `/api/v1/usuarios/{id}` | Atualiza usuário |
-| DELETE | `/api/v1/usuarios/{id}` | Remove usuário |
+| GET | `/usuarios` | Lista usuários |
+| GET | `/usuarios/{id}` | Busca usuário por ID |
+| POST | `/usuarios` | Cadastra usuário |
+| PUT | `/usuarios/{id}` | Atualiza usuário |
+| DELETE | `/usuarios/{id}` | Remove usuário |
 
 Filtros da listagem:
 
@@ -314,7 +315,7 @@ email
 Exemplo:
 
 ```text
-http://localhost:8080/api/v1/usuarios?pagina=1&tamanhoPagina=10
+http://localhost:8080/usuarios?pagina=1&tamanhoPagina=10
 ```
 
 ## Testar pelo PowerShell
@@ -331,7 +332,7 @@ $novoUsuario = @{
 } | ConvertTo-Json
 
 $criado = Invoke-RestMethod -Method Post `
-  -Uri "http://localhost:8080/api/v1/usuarios" `
+  -Uri "http://localhost:8080/usuarios" `
   -ContentType "application/json" `
   -Body $novoUsuario
 
@@ -342,13 +343,13 @@ $criado
 Listar:
 
 ```powershell
-Invoke-RestMethod "http://localhost:8080/api/v1/usuarios?pagina=1&tamanhoPagina=10"
+Invoke-RestMethod "http://localhost:8080/usuarios?pagina=1&tamanhoPagina=10"
 ```
 
 Buscar por ID:
 
 ```powershell
-Invoke-RestMethod "http://localhost:8080/api/v1/usuarios/$id"
+Invoke-RestMethod "http://localhost:8080/usuarios/$id"
 ```
 
 Atualizar:
@@ -363,7 +364,7 @@ $usuarioAlterado = @{
 } | ConvertTo-Json
 
 Invoke-RestMethod -Method Put `
-  -Uri "http://localhost:8080/api/v1/usuarios/$id" `
+  -Uri "http://localhost:8080/usuarios/$id" `
   -ContentType "application/json" `
   -Body $usuarioAlterado
 ```
@@ -371,7 +372,7 @@ Invoke-RestMethod -Method Put `
 Remover:
 
 ```powershell
-Invoke-RestMethod -Method Delete "http://localhost:8080/api/v1/usuarios/$id"
+Invoke-RestMethod -Method Delete "http://localhost:8080/usuarios/$id"
 ```
 
 ## Testes

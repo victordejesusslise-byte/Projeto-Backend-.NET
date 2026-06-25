@@ -59,7 +59,7 @@ public class UsuariosControllerTests : IClassFixture<WebApplicationFactory<Progr
     [Fact]
     public async Task GET_Usuarios_Retorna200()
     {
-        var response = await _client.GetAsync("/api/v1/usuarios");
+        var response = await _client.GetAsync("/usuarios");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
@@ -69,7 +69,7 @@ public class UsuariosControllerTests : IClassFixture<WebApplicationFactory<Progr
         var request = new CriarUsuarioRequest(
             "Victor", "Teste", "victor@integ.com", Genero.Masculino, new DateTime(1998, 3, 20));
 
-        var response = await _client.PostAsJsonAsync("/api/v1/usuarios", request);
+        var response = await _client.PostAsJsonAsync("/usuarios", request);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
@@ -85,8 +85,8 @@ public class UsuariosControllerTests : IClassFixture<WebApplicationFactory<Progr
         var request = new CriarUsuarioRequest(
             "Ana", "Dup", "dup@integ.com", Genero.Feminino, null);
 
-        await _client.PostAsJsonAsync("/api/v1/usuarios", request);
-        var response = await _client.PostAsJsonAsync("/api/v1/usuarios", request);
+        await _client.PostAsJsonAsync("/usuarios", request);
+        var response = await _client.PostAsJsonAsync("/usuarios", request);
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
 
@@ -98,7 +98,7 @@ public class UsuariosControllerTests : IClassFixture<WebApplicationFactory<Progr
     [Fact]
     public async Task GET_Usuarios_IdInexistente_Retorna404()
     {
-        var response = await _client.GetAsync("/api/v1/usuarios/999999");
+        var response = await _client.GetAsync("/usuarios/999999");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
 
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<object>>();
@@ -110,12 +110,12 @@ public class UsuariosControllerTests : IClassFixture<WebApplicationFactory<Progr
     {
         // Cria
         var create = new CriarUsuarioRequest("Put", "Teste", "put@integ.com", Genero.Outro, null);
-        var postResp = await _client.PostAsJsonAsync("/api/v1/usuarios", create);
+        var postResp = await _client.PostAsJsonAsync("/usuarios", create);
         var created = await postResp.Content.ReadFromJsonAsync<ApiResponse<UsuarioResponse>>();
 
         // Atualiza
         var update = new AtualizarUsuarioRequest("Atualizado", "Sobrenome", "put@integ.com", Genero.Outro, null);
-        var putResp = await _client.PutAsJsonAsync($"/api/v1/usuarios/{created!.Dados!.Id}", update);
+        var putResp = await _client.PutAsJsonAsync($"/usuarios/{created!.Dados!.Id}", update);
 
         Assert.Equal(HttpStatusCode.OK, putResp.StatusCode);
         var updated = await putResp.Content.ReadFromJsonAsync<ApiResponse<UsuarioResponse>>();
@@ -126,10 +126,10 @@ public class UsuariosControllerTests : IClassFixture<WebApplicationFactory<Progr
     public async Task DELETE_Usuarios_UsuarioExistente_Retorna204()
     {
         var create = new CriarUsuarioRequest("Del", "User", "del@integ.com", Genero.Feminino, null);
-        var postResp = await _client.PostAsJsonAsync("/api/v1/usuarios", create);
+        var postResp = await _client.PostAsJsonAsync("/usuarios", create);
         var created = await postResp.Content.ReadFromJsonAsync<ApiResponse<UsuarioResponse>>();
 
-        var deleteResp = await _client.DeleteAsync($"/api/v1/usuarios/{created!.Dados!.Id}");
+        var deleteResp = await _client.DeleteAsync($"/usuarios/{created!.Dados!.Id}");
         Assert.Equal(HttpStatusCode.NoContent, deleteResp.StatusCode);
     }
 
@@ -138,7 +138,7 @@ public class UsuariosControllerTests : IClassFixture<WebApplicationFactory<Progr
     {
         using var content = new StringContent("{ nome: ", Encoding.UTF8, "application/json");
 
-        var response = await _client.PostAsync("/api/v1/usuarios", content);
+        var response = await _client.PostAsync("/usuarios", content);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<object>>();
@@ -154,7 +154,7 @@ public class UsuariosControllerTests : IClassFixture<WebApplicationFactory<Progr
         var request = new CriarUsuarioRequest(
             "Ana", "Teste", "email-invalido", Genero.Feminino, null);
 
-        var response = await _client.PostAsJsonAsync("/api/v1/usuarios", request);
+        var response = await _client.PostAsJsonAsync("/usuarios", request);
 
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<object>>();
@@ -165,7 +165,7 @@ public class UsuariosControllerTests : IClassFixture<WebApplicationFactory<Progr
     [Fact]
     public async Task GET_Usuarios_PaginacaoInvalida_Retorna422()
     {
-        var response = await _client.GetAsync("/api/v1/usuarios?pagina=0&tamanhoPagina=101");
+        var response = await _client.GetAsync("/usuarios?pagina=0&tamanhoPagina=101");
 
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<object>>();
@@ -175,7 +175,7 @@ public class UsuariosControllerTests : IClassFixture<WebApplicationFactory<Progr
     [Fact]
     public async Task GET_Usuarios_IdZero_Retorna422()
     {
-        var response = await _client.GetAsync("/api/v1/usuarios/0");
+        var response = await _client.GetAsync("/usuarios/0");
 
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<ApiResponse<object>>();

@@ -40,31 +40,31 @@
       <div class="endpoints-grid">
         <article class="endpoint-card">
           <span class="metodo get">GET</span>
-          <code>/api/v1/usuarios</code>
+          <code>/usuarios</code>
           <p>Lista usuários com filtros e paginação.</p>
         </article>
 
         <article class="endpoint-card">
           <span class="metodo get">GET</span>
-          <code>/api/v1/usuarios/{id}</code>
+          <code>/usuarios/{id}</code>
           <p>Busca um usuário específico pelo ID.</p>
         </article>
 
         <article class="endpoint-card">
           <span class="metodo post">POST</span>
-          <code>/api/v1/usuarios</code>
+          <code>/usuarios</code>
           <p>Cadastra um novo usuário.</p>
         </article>
 
         <article class="endpoint-card">
           <span class="metodo put">PUT</span>
-          <code>/api/v1/usuarios/{id}</code>
+          <code>/usuarios/{id}</code>
           <p>Atualiza os dados de um usuário existente.</p>
         </article>
 
         <article class="endpoint-card">
           <span class="metodo delete">DELETE</span>
-          <code>/api/v1/usuarios/{id}</code>
+          <code>/usuarios/{id}</code>
           <p>Remove um usuário pelo ID.</p>
         </article>
       </div>
@@ -75,7 +75,7 @@
         <div class="topo-cartao">
           <div>
             <p class="legenda">POST e PUT</p>
-            <h2 id="titulo-formulario-admin">@(Model.EmEdicao ? $"PUT /api/v1/usuarios/{Model.Formulario.Id}" : "POST /api/v1/usuarios")</h2>
+            <h2 id="titulo-formulario-admin">@(Model.EmEdicao ? $"PUT /usuarios/{Model.Formulario.Id}" : "POST /usuarios")</h2>
             <p class="descricao menor">Use este formulário para cadastrar ou editar usuários.</p>
           </div>
 
@@ -138,7 +138,7 @@
         <div class="topo-cartao">
           <div>
             <p class="legenda">GET por ID</p>
-            <h2 id="titulo-busca-admin">GET /api/v1/usuarios/{id}</h2>
+            <h2 id="titulo-busca-admin">GET /usuarios/{id}</h2>
             <p class="descricao menor">Busque um registro específico pelo ID.</p>
           </div>
         </div>
@@ -186,7 +186,7 @@
       <div class="topo-lista">
         <div>
           <p class="legenda">GET e DELETE</p>
-          <h2 id="titulo-tabela-admin">GET /api/v1/usuarios</h2>
+          <h2 id="titulo-tabela-admin">GET /usuarios</h2>
           <p class="descricao menor">@Model.ResumoLista</p>
         </div>
         <a class="botao-link" asp-page="/Admin/Tabela">Atualizar tabela</a>
@@ -300,3 +300,4 @@
   </main>
 </body>
 </html>
+

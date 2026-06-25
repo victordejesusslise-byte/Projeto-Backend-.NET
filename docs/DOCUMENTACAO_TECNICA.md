@@ -84,7 +84,8 @@ Esses itens não impedem avaliação local. A área privada atual usa cookie de 
 | `http://localhost:8080/site/admin/tabela` | Painel privado dos endpoints e tabela | Avaliador e administrador local |
 | `http://localhost:8080/swagger` | Swagger | Desenvolvedor e avaliador |
 | `http://localhost:8080/health` | Health check | Operação e monitoramento |
-| `http://localhost:8080/api/v1/usuarios` | API REST | Sistemas clientes |
+| `http://localhost:8080/usuarios` | API REST principal | Sistemas clientes |
+| `http://localhost:8080/api/v1/usuarios` | Alias versionado da API REST | Sistemas clientes |
 
 Todos os endereços são rotas da mesma aplicação. Não existem três servidores diferentes.
 
@@ -115,7 +116,7 @@ Entity Framework Core
 SQL Server - usuarios_db
 ```
 
-Os endpoints REST continuam disponíveis em `/api/v1/usuarios` e seguem o fluxo `UsuariosController -> UsuarioService -> Repository -> SQL Server`.
+Os endpoints REST principais estão disponíveis em `/usuarios` e seguem o fluxo `UsuariosController -> UsuarioService -> Repository -> SQL Server`. A rota `/api/v1/usuarios` também foi mantida como alias versionado.
 
 ### 4.3 Dependências entre camadas
 
@@ -334,7 +335,11 @@ O User Secrets é usado somente no desenvolvimento. O `.env` é consumido pelo D
 
 ## 11. Contrato da API
 
-Base URL no Docker: `http://localhost:8080/api/v1`.
+Base URL principal no Docker: `http://localhost:8080`.
+
+Rota principal do recurso: `/usuarios`.
+
+Alias versionado mantido por compatibilidade: `/api/v1/usuarios`.
 
 ### 11.1 POST /usuarios
 
@@ -387,7 +392,7 @@ Lista usuários com paginação.
 Exemplo:
 
 ```http
-GET /api/v1/usuarios?pagina=1&tamanhoPagina=10&nome=Victor
+GET /usuarios?pagina=1&tamanhoPagina=10&nome=Victor
 ```
 
 Resposta 200:
